@@ -10,9 +10,9 @@ pub struct Cache {
     store: HashMap<String, String>,
 }
 
-pub struct KeyValue<'a> {
+pub struct KeyValue<'a, T: ?Sized = str> {
     key: &'a str,
-    value: &'a str,
+    value: &'a T,
 }
 
 impl Cache {
