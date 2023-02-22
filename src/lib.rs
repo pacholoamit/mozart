@@ -1,4 +1,6 @@
-pub struct Cache {}
+pub struct Cache {
+    pub ttl: u16
+}
 
 impl Cache {
     pub fn new() -> Self {
