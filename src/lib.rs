@@ -8,16 +8,6 @@ pub struct Cache {
     store: HashMap<String, String>,
 }
 
-impl Cache {
-    pub fn new(ttl: u32, delete_on_expire: bool) -> Self {
-        Cache {
-            ttl,
-            delete_on_expire,
-            store: HashMap::new(),
-        }
-    }
-}
-
 impl Default for Cache {
     fn default() -> Self {
         Cache {
@@ -28,9 +18,36 @@ impl Default for Cache {
     }
 }
 
+impl Cache {
+    pub fn new(ttl: u32, delete_on_expire: bool) -> Self {
+        Cache {
+            ttl,
+            delete_on_expire,
+            store: HashMap::new(),
+        }
+    }
+
+    pub fn set(&mut self, key: String, value: String) -> Result<bool, &'static str> {
+        let result = match self.store.insert(key, value) {
+            Some(_) => Ok(true),
+            None => Err("Key does not exit in cache"),
+        };
+
+        return result;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_default_cache() {
+        let cache = Cache::default();
+
+        assert_eq!(cache.ttl, 0);
+        assert_eq!(cache.delete_on_expire, false)
+    }
 
     #[test]
     fn test_new_cache() {
@@ -41,10 +58,19 @@ mod tests {
     }
 
     #[test]
-    fn test_default_cache() {
-        let cache = Cache::default();
+    fn test_set() {
+        let mut cache = Cache::default();
 
-        assert_eq!(cache.ttl, 0);
-        assert_eq!(cache.delete_on_expire, false)
+        // Add a key-value pair to the cache
+        let result = cache.set("foo".to_string(), "123".to_string());
+
+        // Check that the method returns Ok
+        assert_eq!(result, Ok(true));
+
+        // Add another key-value pair with the same key
+        let result = cache.set("foo".to_string(), "456".to_string());
+
+        // Check that the method returns an Err with the correct error message
+        assert_eq!(result, Err("Key already exists in cache"));
     }
 }
