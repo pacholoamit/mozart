@@ -55,7 +55,7 @@ mod tests {
     }
 
     #[test]
-    fn test_set() {
+    fn test_set_value_in_cache() {
         let mut cache = Cache::default();
 
         let key = "foo";
@@ -77,7 +77,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get() {
+    fn test_get_value_from_cache() {
         let mut cache = Cache::new(60, false);
 
         // Add a key-value pair to the cache
