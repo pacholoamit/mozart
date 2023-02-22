@@ -73,18 +73,11 @@ mod tests {
         let key = "foo";
         let value = "123";
 
-        // Add a key-value pair to the cache
         let result = cache.set(key, value);
-
-        // Check that the method returns Ok
         assert_eq!(result, Ok(()));
 
         let second_value = "456";
-
-        // Add another key-value pair with the same key
         let result = cache.set(key, second_value);
-
-        // Check that the method returns an Err with the correct error message
         assert_eq!(result, Err("Key already exists in cache"));
     }
 
@@ -117,20 +110,12 @@ mod tests {
     #[test]
     fn test_get_value_from_cache() {
         let mut cache = Cache::new(60, false);
-
-        // Add a key-value pair to the cache
         cache.set("foo", "123").unwrap();
 
-        // Get the value associated with the key
         let result = cache.get("foo");
-
-        // Check that the method returns Ok with the correct value
         assert_eq!(result, Ok(&"123".to_string()));
 
-        // Try to get the value associated with a non-existent key
         let result = cache.get("bar");
-
-        // Check that the method returns an Err with the correct error message
         assert_eq!(result, Err("Key does not exist in cache"));
     }
 }
