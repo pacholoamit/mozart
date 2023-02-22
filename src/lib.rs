@@ -1,21 +1,13 @@
 use std::collections::HashMap;
 
+#[allow(dead_code)]
+#[derive(Default)]
 pub struct Cache {
     /// the standard ttl as number in seconds for every generated cache element
     ttl: u32,
     /// whether variables will be deleted automatically when they expire. If true the variable will be deleted. If false
     delete_on_expire: bool,
     store: HashMap<String, String>,
-}
-
-impl Default for Cache {
-    fn default() -> Self {
-        Cache {
-            ttl: 0,
-            delete_on_expire: false,
-            store: HashMap::new(),
-        }
-    }
 }
 
 impl Cache {
@@ -28,21 +20,17 @@ impl Cache {
     }
 
     pub fn set(&mut self, key: &str, value: &str) -> Result<(), &'static str> {
-        let success = match self.store.insert(key.into(), value.into()) {
+        match self.store.insert(key.into(), value.into()) {
             Some(_) => Err("Key already exists in cache"),
             None => Ok(()),
-        };
-
-        return success;
+        }
     }
 
     pub fn get(&mut self, key: &str) -> Result<&String, &'static str> {
-        let value = match self.store.get(key) {
+        match self.store.get(key) {
             Some(v) => Ok(v),
             None => Err("Key does not exist in cache"),
-        };
-
-        return value;
+        }
     }
 }
 
@@ -55,7 +43,7 @@ mod tests {
         let cache = Cache::default();
 
         assert_eq!(cache.ttl, 0);
-        assert_eq!(cache.delete_on_expire, false)
+        assert!(!cache.delete_on_expire)
     }
 
     #[test]
@@ -63,7 +51,7 @@ mod tests {
         let cache = Cache::new(60, true);
 
         assert_eq!(cache.ttl, 60);
-        assert_eq!(cache.delete_on_expire, true)
+        assert!(cache.delete_on_expire);
     }
 
     #[test]
@@ -74,7 +62,7 @@ mod tests {
         let value = "123";
 
         // Add a key-value pair to the cache
-        let result = cache.set(&key, &value);
+        let result = cache.set(key, value);
 
         // Check that the method returns Ok
         assert_eq!(result, Ok(()));
@@ -82,7 +70,7 @@ mod tests {
         let second_value = "456";
 
         // Add another key-value pair with the same key
-        let result = cache.set(&key, &second_value);
+        let result = cache.set(key, second_value);
 
         // Check that the method returns an Err with the correct error message
         assert_eq!(result, Err("Key already exists in cache"));
