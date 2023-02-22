@@ -1,3 +1,5 @@
+use mozart::Cache;
+
 fn main() {
-    let cache = mozart::Cache {};
+    let cache = Cache::new(0, false);
 }
