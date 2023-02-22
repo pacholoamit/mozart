@@ -28,12 +28,12 @@ impl Cache {
     }
 
     pub fn set(&mut self, key: &str, value: &str) -> Result<(), &'static str> {
-        let is_success = match self.store.insert(key.into(), value.into()) {
+        let success = match self.store.insert(key.into(), value.into()) {
             Some(_) => Err("Key already exists in cache"),
             None => Ok(()),
         };
 
-        return is_success;
+        return success;
     }
 
     pub fn get(&mut self, key: &str) -> Result<&String, &'static str> {
