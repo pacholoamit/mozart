@@ -10,6 +10,11 @@ pub struct Cache {
     store: HashMap<String, String>,
 }
 
+pub struct KeyValue<'a> {
+    key: &'a str,
+    value: &'a str,
+}
+
 impl Cache {
     pub fn new(ttl: u32, delete_on_expire: bool) -> Self {
         Cache {
@@ -24,6 +29,13 @@ impl Cache {
             Some(_) => Err("Key already exists in cache"),
             None => Ok(()),
         }
+    }
+
+    pub fn set_multiple(&mut self, vec: Vec<KeyValue>) -> Result<(), &'static str> {
+        for item in vec.iter() {
+            self.set(item.key, item.value).unwrap()
+        }
+        Ok(())
     }
 
     pub fn get(&mut self, key: &str) -> Result<&String, &'static str> {
@@ -74,6 +86,32 @@ mod tests {
 
         // Check that the method returns an Err with the correct error message
         assert_eq!(result, Err("Key already exists in cache"));
+    }
+
+    #[test]
+    fn test_set_multiple() {
+        let mut cache = Cache::default();
+
+        let input = vec![
+            KeyValue {
+                key: "key1",
+                value: "value1",
+            },
+            KeyValue {
+                key: "key2",
+                value: "value2",
+            },
+            KeyValue {
+                key: "key3",
+                value: "value3",
+            },
+        ];
+
+        assert_eq!(cache.set_multiple(input), Ok(()));
+
+        assert_eq!(cache.get("key1"), Ok(&String::from("value1")));
+        assert_eq!(cache.get("key2"), Ok(&String::from("value2")));
+        assert_eq!(cache.get("key3"), Ok(&String::from("value3")));
     }
 
     #[test]
