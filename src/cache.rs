@@ -66,15 +66,11 @@ mod tests {
     fn test_set_value_in_cache() {
         let mut cache = Cache::default();
 
-        let key = "foo";
-        let value = "123";
+        cache.set("foo", "123");
+        assert_eq!(cache.get("foo"), Ok("123".to_owned()));
 
-        assert_eq!(cache.get(key), Ok(value.to_owned()));
-
-        let second_value = "456";
-        cache.set(key, second_value);
-
-        assert_eq!(cache.get(key), Ok(second_value.to_owned()));
+        cache.set("foo", "456");
+        assert_eq!(cache.get("foo"), Ok("456".to_owned()));
     }
 
     #[test]
@@ -106,12 +102,13 @@ mod tests {
     #[test]
     fn test_get_value_from_cache() {
         let mut cache = Cache::new(60, false);
-        cache.set("foo", "123");
+        cache.set("example", "123");
 
-        let result = cache.get("foo");
-        assert_eq!(result, Ok("123".to_string()));
+        assert_eq!(cache.get("example"), Ok("123".to_string()));
 
-        let result = cache.get("bar");
-        assert_eq!(result, Err(Error::CacheKeyNotFound(String::from("bar"))));
+        assert_eq!(
+            cache.get("bar"),
+            Err(Error::CacheKeyNotFound(("bar").to_string()))
+        );
     }
 }
