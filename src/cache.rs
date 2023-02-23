@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-#[allow(dead_code)]
 #[derive(Default)]
 pub struct Cache {
     /// the standard ttl as number in seconds for every generated cache element
