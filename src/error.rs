@@ -8,6 +8,4 @@ pub enum Error {
 
     #[error("Key `{0}` does not exist in cache")]
     CacheKeyNotFound(String),
-    // #[error("Key does not exist in cache")]
-    // CacheKeyNotFound(),
 }

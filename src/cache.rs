@@ -69,15 +69,12 @@ mod tests {
         let key = "foo";
         let value = "123";
 
-        cache.set(key, value);
-        let result = cache.get(key).unwrap();
-        assert_eq!(result, value);
+        assert_eq!(cache.get(key), Ok(value.to_owned()));
 
         let second_value = "456";
         cache.set(key, second_value);
-        let result = cache.get(key).unwrap();
 
-        assert_eq!(result, second_value);
+        assert_eq!(cache.get(key), Ok(second_value.to_owned()));
     }
 
     #[test]
