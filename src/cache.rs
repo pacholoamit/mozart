@@ -10,6 +10,7 @@ pub struct Cache {
     store: HashMap<String, String>,
 }
 
+// Todo: Add Serde Serialize here
 pub struct KeyValue<'a, T: ?Sized = str> {
     key: &'a str,
     value: &'a T,
