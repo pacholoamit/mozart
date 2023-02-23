@@ -1,3 +1,4 @@
+use crate::prelude::*;
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -23,24 +24,20 @@ impl Cache {
         }
     }
 
-    pub fn set(&mut self, key: &str, value: &str) -> Result<(), &'static str> {
-        match self.store.insert(key.into(), value.into()) {
-            Some(_) => Err("Key already exists in cache"),
-            None => Ok(()),
-        }
+    pub fn set(&mut self, key: &str, value: &str) {
+        self.store.insert(key.into(), value.into());
     }
 
-    pub fn set_multiple(&mut self, vec: Vec<KeyValue>) -> Result<(), &'static str> {
+    pub fn set_multiple(&mut self, vec: Vec<KeyValue>) {
         for item in vec.iter() {
-            self.set(item.key, item.value).unwrap()
+            self.set(item.key, item.value)
         }
-        Ok(())
     }
 
-    pub fn get(&mut self, key: &str) -> Result<&String, &'static str> {
+    pub fn get(&mut self, key: &str) -> Result<String> {
         match self.store.get(key) {
-            Some(v) => Ok(v),
-            None => Err("Key does not exist in cache"),
+            Some(v) => Ok(v.to_owned()),
+            None => Err(Error::CacheKeyNotFound(key.into())),
         }
     }
 }
@@ -72,12 +69,15 @@ mod tests {
         let key = "foo";
         let value = "123";
 
-        let result = cache.set(key, value);
-        assert_eq!(result, Ok(()));
+        cache.set(key, value);
+        let result = cache.get(key).unwrap();
+        assert_eq!(result, value);
 
         let second_value = "456";
-        let result = cache.set(key, second_value);
-        assert_eq!(result, Err("Key already exists in cache"));
+        cache.set(key, second_value);
+        let result = cache.get(key).unwrap();
+
+        assert_eq!(result, second_value);
     }
 
     #[test]
@@ -99,22 +99,22 @@ mod tests {
             },
         ];
 
-        assert_eq!(cache.set_multiple(input), Ok(()));
+        cache.set_multiple(input);
 
-        assert_eq!(cache.get("key1"), Ok(&String::from("value1")));
-        assert_eq!(cache.get("key2"), Ok(&String::from("value2")));
-        assert_eq!(cache.get("key3"), Ok(&String::from("value3")));
+        assert_eq!(cache.get("key1"), Ok("value1".to_owned()));
+        assert_eq!(cache.get("key2"), Ok("value2".to_owned()));
+        assert_eq!(cache.get("key3"), Ok("value3".to_owned()));
     }
 
     #[test]
     fn test_get_value_from_cache() {
         let mut cache = Cache::new(60, false);
-        cache.set("foo", "123").unwrap();
+        cache.set("foo", "123");
 
         let result = cache.get("foo");
-        assert_eq!(result, Ok(&"123".to_string()));
+        assert_eq!(result, Ok("123".to_string()));
 
         let result = cache.get("bar");
-        assert_eq!(result, Err("Key does not exist in cache"));
+        assert_eq!(result, Err(Error::CacheKeyNotFound(String::from("bar"))));
     }
 }
