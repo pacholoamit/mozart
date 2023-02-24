@@ -35,10 +35,10 @@ impl Cache {
         }
     }
 
-    pub fn get(&mut self, key: &str) -> Result<String> {
+    pub fn get(&mut self, key: &str) -> Result<String, CacheError> {
         match self.store.get(key) {
             Some(v) => Ok(v.to_owned()),
-            None => Err(Error::CacheKeyNotFound(key.into())),
+            None => Err(CacheError::CacheKeyNotFound(key.into())),
         }
     }
 }
@@ -109,7 +109,7 @@ mod tests {
 
         assert_eq!(
             cache.get("bar"),
-            Err(Error::CacheKeyNotFound(("bar").to_string()))
+            Err(CacheError::CacheKeyNotFound(("bar").to_string()))
         );
     }
 }
