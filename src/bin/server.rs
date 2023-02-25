@@ -3,17 +3,11 @@
 use anyhow::Result;
 use mozart::{Cache, HashMapCache};
 use serde_json::json;
+use tokio::net::TcpListener;
 
-fn main() -> Result<()> {
-    let mut cache = HashMapCache::default();
-
-    let value = json!(1);
-
-    cache.set("example", &value);
-
-    let v = cache.get("example").unwrap();
-
-    print!("{v}");
+#[tokio::main]
+pub async fn main() -> Result<()> {
+    let listener = TcpListener::bind(&format!("127.0.0.1:{}", 8080)).await?;
 
     Ok(())
 }
