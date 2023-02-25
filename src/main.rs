@@ -1,8 +1,9 @@
 #![allow(unused)]
 
 use anyhow::Result;
-use cache::Cache;
 use serde_json::json;
+
+use crate::cache::{Cache, HashMapCache};
 
 mod cache;
 mod error;
@@ -10,7 +11,7 @@ mod prelude;
 mod utils;
 
 fn main() -> Result<()> {
-    let mut cache = Cache::default();
+    let mut cache = HashMapCache::default();
 
     let value = json!(1);
 
