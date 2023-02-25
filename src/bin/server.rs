@@ -1,16 +1,11 @@
 #![allow(unused)]
 
 use anyhow::Result;
-use cache::Cache;
+use mozart::{Cache, HashMapCache};
 use serde_json::json;
 
-mod cache;
-mod error;
-mod prelude;
-mod utils;
-
 fn main() -> Result<()> {
-    let mut cache = Cache::default();
+    let mut cache = HashMapCache::default();
 
     let value = json!(1);
 
