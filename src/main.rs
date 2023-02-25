@@ -1,7 +1,8 @@
 #![allow(unused)]
 
-use crate::prelude::*;
+use anyhow::Result;
 use cache::Cache;
+use serde_json::json;
 
 mod cache;
 mod error;
@@ -9,13 +10,15 @@ mod prelude;
 mod utils;
 
 fn main() -> Result<()> {
-    let mut cache = Cache::new(0, false);
+    let mut cache = Cache::default();
 
-    cache.set("Example", "123").unwrap();
+    let value = json!(1);
 
-    let result = cache.get("Example").unwrap();
+    cache.set("example", &value);
 
-    println!("{}", result);
+    let v = cache.get("example").unwrap();
+
+    print!("{v}");
 
     Ok(())
 }
