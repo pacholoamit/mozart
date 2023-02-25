@@ -3,7 +3,7 @@
 use anyhow::Result;
 use serde_json::json;
 
-use crate::cache::{Cache, HashMapCache};
+use crate::cache::{HashMapCache, Cache};
 
 mod cache;
 mod error;

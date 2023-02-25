@@ -1,7 +1,9 @@
-use super::*;
 use serde_json::{json, Value};
 use std::any::Any;
 use std::collections::HashMap;
+
+use crate::prelude::*;
+use crate::cache::common::*;
 
 #[derive(Default)]
 pub struct HashMapCache {
