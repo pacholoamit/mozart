@@ -1,14 +1,8 @@
 #![allow(unused)]
 
 use anyhow::Result;
+use mozart::{Cache, HashMapCache};
 use serde_json::json;
-
-use crate::cache::{HashMapCache, Cache};
-
-mod cache;
-mod error;
-mod prelude;
-mod utils;
 
 fn main() -> Result<()> {
     let mut cache = HashMapCache::default();
