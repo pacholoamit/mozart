@@ -1,4 +1,7 @@
+use serde_json::{json, Value};
+
 use crate::prelude::*;
+use std::any::Any;
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -7,13 +10,12 @@ pub struct Cache {
     ttl: u32,
     /// whether variables will be deleted automatically when they expire. If true the variable will be deleted. If false
     delete_on_expire: bool,
-    store: HashMap<String, String>,
+    store: HashMap<String, Value>,
 }
 
-// Todo: Add Serde Serialize here
-pub struct KeyValue<'a, T: ?Sized = str> {
+pub struct KeyValue<'a> {
     key: &'a str,
-    value: &'a T,
+    value: Value,
 }
 
 impl Cache {
@@ -25,17 +27,17 @@ impl Cache {
         }
     }
 
-    pub fn set(&mut self, key: &str, value: &str) {
-        self.store.insert(key.into(), value.into());
+    pub fn set(&mut self, key: &str, value: &Value) {
+        self.store.insert(key.to_string(), value.clone());
     }
 
     pub fn set_multiple(&mut self, vec: Vec<KeyValue>) {
         for item in vec.iter() {
-            self.set(item.key, item.value)
+            self.set(item.key, &item.value);
         }
     }
 
-    pub fn get(&mut self, key: &str) -> Result<String, CacheError> {
+    pub fn get(&mut self, key: &str) -> Result<Value, CacheError> {
         match self.store.get(key) {
             Some(v) => Ok(v.to_owned()),
             None => Err(CacheError::CacheKeyNotFound(key.into())),
@@ -45,6 +47,8 @@ impl Cache {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
 
     #[test]
@@ -64,52 +68,54 @@ mod tests {
     }
 
     #[test]
-    fn test_set_value_in_cache() {
+    fn test_cache_string_value() {
         let mut cache = Cache::default();
-
-        cache.set("foo", "123");
-        assert_eq!(cache.get("foo"), Ok("123".to_owned()));
-
-        cache.set("foo", "456");
-        assert_eq!(cache.get("foo"), Ok("456".to_owned()));
+        cache.set("string_value", &json!("hello world"));
+        assert_eq!(
+            cache.get("string_value").unwrap().as_str(),
+            Some("hello world")
+        );
     }
 
     #[test]
-    fn test_set_multiple() {
+    fn test_cache_json_value() {
         let mut cache = Cache::default();
+        let json_value = json!({
+            "name": "Alice",
+            "age": 30,
+            "city": "New York"
+        });
 
-        let input = vec![
+        cache.set("json_value", &json_value);
+        assert_eq!(cache.get("json_value").unwrap(), json_value.clone());
+    }
+
+    #[test]
+    fn test_cache_get_not_found() {
+        let mut cache = Cache::default();
+        assert_eq!(
+            cache.get("key1"),
+            Err(CacheError::CacheKeyNotFound("key1".into()))
+        );
+    }
+
+    #[test]
+    fn test_cache_set_multiple() {
+        let mut cache = Cache::default();
+        let vec = vec![
             KeyValue {
                 key: "key1",
-                value: "value1",
+                value: json!("value1"),
             },
             KeyValue {
                 key: "key2",
-                value: "value2",
-            },
-            KeyValue {
-                key: "key3",
-                value: "value3",
+                value: json!("value2"),
             },
         ];
 
-        cache.set_multiple(input);
+        cache.set_multiple(vec);
 
-        assert_eq!(cache.get("key1"), Ok("value1".to_owned()));
-        assert_eq!(cache.get("key2"), Ok("value2".to_owned()));
-        assert_eq!(cache.get("key3"), Ok("value3".to_owned()));
-    }
-
-    #[test]
-    fn test_get_value_from_cache() {
-        let mut cache = Cache::new(60, false);
-        cache.set("example", "123");
-
-        assert_eq!(cache.get("example"), Ok("123".to_string()));
-
-        assert_eq!(
-            cache.get("bar"),
-            Err(CacheError::CacheKeyNotFound(("bar").to_string()))
-        );
+        assert_eq!(cache.store.get("key1"), Some(&json!("value1")));
+        assert_eq!(cache.store.get("key2"), Some(&json!("value2")));
     }
 }
