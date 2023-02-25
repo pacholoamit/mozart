@@ -49,6 +49,10 @@ impl Cache for HashMapCache {
     fn keys(&mut self) -> Vec<String> {
         self.store.keys().cloned().collect()
     }
+
+    fn has(&mut self, key: impl Into<String>) -> bool {
+        self.store.contains_key(&key.into())
+    }
 }
 
 #[cfg(test)]
@@ -168,5 +172,14 @@ mod hashmap_cache_tests {
 
         cache.set("example1", &json!("value1"));
         assert_eq!(cache.keys(), vec!["example1"]);
+    }
+
+    #[test]
+    fn test_cache_has() {
+        let mut cache = HashMapCache::default();
+
+        cache.set("example1", &json!("value1"));
+        assert!(cache.has("example1"));
+        assert!(!cache.has("example2"));
     }
 }

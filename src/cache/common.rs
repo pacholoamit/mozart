@@ -15,4 +15,5 @@ pub trait Cache {
     fn delete(&mut self, key: impl Into<String>);
     fn delete_multiple(&mut self, keys: Vec<impl Into<String>>);
     fn keys(&mut self) -> Vec<String>;
+    fn has(&mut self, key: impl Into<String>) -> bool;
 }
