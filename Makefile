@@ -4,8 +4,11 @@
 check-cargo-watch:
 	@which cargo-watch > /dev/null || cargo install cargo-watch
 
-run-cargo-watch:
-	@cargo watch -q -c -x "test" -x "run --bin mozart-server"
+run-server:
+	@cargo watch -q -c -x "run --bin mozart-server"
+
+run-client:
+	@cargo watch -q -c -x "run --bin mozart-client"
 
 doc:
 	@cargo doc
@@ -13,4 +16,5 @@ doc:
 	
 dev:
 	@make check-cargo-watch
-	@make run-cargo-watch
+	@cargo watch -q -c -x "test" 
+	

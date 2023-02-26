@@ -11,6 +11,10 @@ repository = "https://github.com/pacholoamit/mozart"
 name = "mozart-server"
 path = "src/bin/server.rs"
 
+[[bin]]
+name = "mozart-client"
+path = "src/bin/client.rs"
+
 [dependencies]
 thiserror = "1"
 anyhow = "1"
