@@ -2,7 +2,7 @@
 
 mod cache;
 pub use cache::HashMapCache;
-pub use cache::{Cache, KeyValue};
+pub use cache::{CacheTrait, KeyValue, Cache};
 
 mod server;
 

@@ -13,7 +13,7 @@ pub struct HashMapCache {
     store: HashMap<String, Value>,
 }
 
-impl Cache for HashMapCache {
+impl CacheTrait for HashMapCache {
     fn new(ttl: u32, delete_on_expire: bool) -> Self {
         HashMapCache {
             ttl,
