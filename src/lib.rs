@@ -1,11 +1,9 @@
 #![allow(unused)]
 
-mod cache;
+pub mod cache;
 use cache::HashMapCache;
-pub use cache::{Cache, CacheTrait, KeyValue};
-
-mod server;
 
 mod error;
 mod prelude;
+mod server;
 mod utils;
