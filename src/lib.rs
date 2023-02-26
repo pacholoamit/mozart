@@ -1,8 +1,8 @@
 #![allow(unused)]
 
 mod cache;
-pub use cache::HashMapCache;
-pub use cache::{CacheTrait, KeyValue, Cache};
+use cache::HashMapCache;
+pub use cache::{Cache, CacheTrait, KeyValue};
 
 mod server;
 
