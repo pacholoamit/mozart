@@ -10,12 +10,11 @@ pub mod protobuf {
 #[derive(Debug, Default)]
 pub struct CacheService {}
 
+type GrpcResult<T> = Result<Response<T>, Status>;
+
 #[tonic::async_trait]
 impl Cache for CacheService {
-    async fn get(
-        &self,
-        _request: Request<CacheGetRequest>,
-    ) -> Result<Response<CacheGetResponse>, Status> {
+    async fn get(&self, _request: Request<CacheGetRequest>) -> GrpcResult<CacheGetResponse> {
         let response = CacheGetResponse {
             value: "Hello World!".to_string(),
         };
@@ -23,10 +22,7 @@ impl Cache for CacheService {
         Ok(Response::new(response))
     }
 
-    async fn set(
-        &self,
-        _request: Request<CacheSetRequest>,
-    ) -> Result<Response<CacheSetResponse>, Status> {
+    async fn set(&self, _request: Request<CacheSetRequest>) -> GrpcResult<CacheSetResponse> {
         let response = CacheSetResponse { success: true };
 
         Ok(Response::new(response))
