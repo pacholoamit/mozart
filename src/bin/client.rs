@@ -1,7 +1,6 @@
 use anyhow::{Error, Result};
 use protobuf::cache_client::CacheClient;
 use protobuf::CacheSetRequest;
-
 pub mod protobuf {
     tonic::include_proto!("cache");
 }
