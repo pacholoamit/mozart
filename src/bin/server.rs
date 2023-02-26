@@ -1,43 +1,13 @@
-use anyhow::{Error, Result};
-use protobuf::cache_server::{Cache, CacheServer};
-use protobuf::{CacheGetRequest, CacheGetResponse, CacheSetRequest, CacheSetResponse};
-use tonic::{transport::Server, Request, Response, Status};
-
-pub mod protobuf {
-    tonic::include_proto!("cache");
-}
-
-#[derive(Debug, Default)]
-pub struct CacheService {}
-
-type GrpcResult<T> = Result<Response<T>, Status>;
-
-#[tonic::async_trait]
-impl Cache for CacheService {
-    async fn get(&self, _request: Request<CacheGetRequest>) -> GrpcResult<CacheGetResponse> {
-        let response = CacheGetResponse {
-            value: "Hello World!".to_string(),
-        };
-
-        Ok(Response::new(response))
-    }
-
-    async fn set(&self, _request: Request<CacheSetRequest>) -> GrpcResult<CacheSetResponse> {
-        let response = CacheSetResponse { success: true };
-
-        Ok(Response::new(response))
-    }
-}
+use mozart::prelude::*;
+use mozart::server;
 
 #[tokio::main]
-pub async fn main() -> Result<(), Error> {
-    let addr = "[::1]:50051".parse()?;
-    let cache_service = CacheService::default();
+pub async fn main() -> Result<()> {
+    let port = 50051;
+    let addr = format!("[::1]:{}", port)
+        .parse()
+        .map_err(|_| Error::InvalidAddress(port))?;
 
-    Server::builder()
-        .add_service(CacheServer::new(cache_service))
-        .serve(addr)
-        .await?;
-
+    server::run(addr).await?;
     Ok(())
 }

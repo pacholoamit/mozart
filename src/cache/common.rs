@@ -1,5 +1,5 @@
+use crate::cache::HashMapCache;
 use crate::prelude::*;
-use crate::HashMapCache;
 use serde_json::Value;
 
 pub struct Cachable<'a> {
@@ -31,5 +31,17 @@ impl Cache {
             Cache::HashMap => HashMapCache::new(0, false),
             Cache::Empty => HashMapCache::default(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cache() {
+        let mut cache = Cache::create(Cache::HashMap);
+        cache.set("test", &Value::String("test".to_string()));
+        assert_eq!(cache.get("test"), Some(Value::String("test".to_string())));
     }
 }
