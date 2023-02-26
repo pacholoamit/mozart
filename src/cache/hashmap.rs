@@ -13,7 +13,7 @@ pub struct HashMapCache {
     store: HashMap<String, Value>,
 }
 
-impl Cache for HashMapCache {
+impl CacheStore for HashMapCache {
     fn new(ttl: u32, delete_on_expire: bool) -> Self {
         HashMapCache {
             ttl,
@@ -26,7 +26,7 @@ impl Cache for HashMapCache {
         self.store.insert(key.to_string(), value.clone());
     }
 
-    fn set_multiple(&mut self, objects: Vec<KeyValue>) {
+    fn set_multiple(&mut self, objects: Vec<Cachable>) {
         objects.iter().for_each(|obj| self.set(obj.key, &obj.value))
     }
 
@@ -80,11 +80,8 @@ mod tests {
     #[test]
     fn test_cache_string_value() {
         let mut cache = HashMapCache::default();
-        cache.set("string_value", &json!("hello world"));
-        assert_eq!(
-            cache.get("string_value").unwrap().as_str(),
-            Some("hello world")
-        );
+        cache.set("foo", &json!("bar"));
+        assert_eq!(cache.get("foo").unwrap().as_str(), Some("bar"));
     }
 
     #[test]
@@ -110,11 +107,11 @@ mod tests {
     fn test_cache_set_multiple() {
         let mut cache = HashMapCache::default();
         let vec = vec![
-            KeyValue {
+            Cachable {
                 key: "key1",
                 value: json!("value1"),
             },
-            KeyValue {
+            Cachable {
                 key: "key2",
                 value: json!("value2"),
             },
@@ -130,11 +127,11 @@ mod tests {
     fn test_cache_get_multiple() {
         let mut cache = HashMapCache::default();
         let vec = vec![
-            KeyValue {
+            Cachable {
                 key: "key1",
                 value: json!("value1"),
             },
-            KeyValue {
+            Cachable {
                 key: "key2",
                 value: json!("value2"),
             },
