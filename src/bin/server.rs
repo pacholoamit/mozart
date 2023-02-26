@@ -1,9 +1,9 @@
 use anyhow::{Error, Result};
-use grpc_cache::cache_server::{Cache, CacheServer};
-use grpc_cache::{CacheGetRequest, CacheGetResponse, CacheSetRequest, CacheSetResponse};
+use protobuf::cache_server::{Cache, CacheServer};
+use protobuf::{CacheGetRequest, CacheGetResponse, CacheSetRequest, CacheSetResponse};
 use tonic::{transport::Server, Request, Response, Status};
 
-pub mod grpc_cache {
+pub mod protobuf {
     tonic::include_proto!("cache");
 }
 
@@ -16,16 +16,20 @@ impl Cache for CacheService {
         &self,
         _request: Request<CacheGetRequest>,
     ) -> Result<Response<CacheGetResponse>, Status> {
-        Ok(Response::new(CacheGetResponse {
+        let response = CacheGetResponse {
             value: "Hello World!".to_string(),
-        }))
+        };
+
+        Ok(Response::new(response))
     }
 
     async fn set(
         &self,
         _request: Request<CacheSetRequest>,
     ) -> Result<Response<CacheSetResponse>, Status> {
-        Ok(Response::new(CacheSetResponse { success: true }))
+        let response = CacheSetResponse { success: true };
+
+        Ok(Response::new(response))
     }
 }
 

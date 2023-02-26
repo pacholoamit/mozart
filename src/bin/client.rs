@@ -1,8 +1,8 @@
 use anyhow::{Error, Result};
-use grpc_cache::cache_client::CacheClient;
-use grpc_cache::{CacheSetRequest};
+use protobuf::cache_client::CacheClient;
+use protobuf::CacheSetRequest;
 
-pub mod grpc_cache {
+pub mod protobuf {
     tonic::include_proto!("cache");
 }
 
