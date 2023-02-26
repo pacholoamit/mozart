@@ -1,4 +1,4 @@
-.PHONY: install-cargo-watch check-protoc install run-server run-client doc dev
+.PHONY: all install install-cargo-watch check-protoc run-server run-client doc
 
 
 install-cargo-watch:
@@ -13,18 +13,15 @@ install:
 	@make check-protoc
 
 run-server:
-	@cargo watch -q -c -x "test" 
-	@cargo watch -q -c -x "run --bin server"
+	@cargo watch -q -c -x "run --bin mozart-server"
 
 run-client:
-	@cargo watch -q -c -x "test" 
-	@cargo watch -q -c -x "run --bin client"
+	@cargo watch -q -c -x "run --bin mozart-client"
 
+test:
+	@cargo watch -q -c -x "test --all"
 doc:
 	@cargo doc
 	@cargo docserver -p 4545
 
-
-dev:
-	@cargo watch -q -c -x "test" 
 	

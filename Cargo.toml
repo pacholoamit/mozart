@@ -8,11 +8,11 @@ repository = "https://github.com/pacholoamit/mozart"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [[bin]]
-name = "server"
+name = "mozart-server"
 path = "src/bin/server.rs"
 
 [[bin]]
-name = "client"
+name = "mozart-client"
 path = "src/bin/client.rs"
 
 
