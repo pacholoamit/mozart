@@ -1,6 +1,6 @@
 use anyhow::{Error, Result};
 use protobuf::cache_client::CacheClient;
-use protobuf::CacheSetRequest;
+use protobuf::{CacheGetRequest, CacheSetRequest};
 pub mod protobuf {
     tonic::include_proto!("cache");
 }
@@ -15,6 +15,14 @@ async fn main() -> Result<(), Error> {
     });
 
     let response = client.set(request).await?;
+
+    println!("RESPONSE={:?}", response);
+
+    let request = tonic::Request::new(CacheGetRequest {
+        key: "Hello".to_string(),
+    });
+
+    let response = client.get(request).await?;
 
     println!("RESPONSE={:?}", response);
 

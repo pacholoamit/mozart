@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use crate::cache::common::*;
 use crate::prelude::*;
 
-#[derive(Default)]
+#[derive(Default, Debug, Clone)]
 pub struct HashMapCache {
     /// the standard ttl as number in seconds for every generated cache element
     ttl: u32,
@@ -13,7 +13,7 @@ pub struct HashMapCache {
     store: HashMap<String, Value>,
 }
 
-impl CacheStore for HashMapCache {
+impl CacheLike for HashMapCache {
     fn new(ttl: u32, delete_on_expire: bool) -> Self {
         HashMapCache {
             ttl,
@@ -30,19 +30,19 @@ impl CacheStore for HashMapCache {
         objects.iter().for_each(|obj| self.set(obj.key, &obj.value))
     }
 
-    fn get(&mut self, key: impl Into<String>) -> Option<Value> {
-        self.store.get(&key.into()).to_owned().cloned()
+    fn get(&mut self, key: &str) -> Option<Value> {
+        self.store.get(key).to_owned().cloned()
     }
 
-    fn get_multiple(&mut self, keys: Vec<impl Into<String>>) -> Vec<Value> {
+    fn get_multiple(&mut self, keys: Vec<&str>) -> Vec<Value> {
         keys.into_iter().filter_map(|key| self.get(key)).collect()
     }
 
-    fn delete(&mut self, key: impl Into<String>) {
-        self.store.remove(&key.into());
+    fn delete(&mut self, key: &str) {
+        self.store.remove(key);
     }
 
-    fn delete_multiple(&mut self, keys: Vec<impl Into<String>>) {
+    fn delete_multiple(&mut self, keys: Vec<&str>) {
         keys.into_iter().for_each(|key| self.delete(key))
     }
 
@@ -50,8 +50,8 @@ impl CacheStore for HashMapCache {
         self.store.keys().cloned().collect()
     }
 
-    fn has(&mut self, key: impl Into<String>) -> bool {
-        self.store.contains_key(&key.into())
+    fn has(&mut self, key: &str) -> bool {
+        self.store.contains_key(key)
     }
 }
 
