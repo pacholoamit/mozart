@@ -1,8 +1,7 @@
 #![allow(unused)]
 
-pub mod cache;
-use cache::HashMapCache;
-
+mod cache;
 mod error;
-mod prelude;
+pub mod prelude;
+pub mod server;
 mod utils;

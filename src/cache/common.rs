@@ -1,35 +1,49 @@
+use crate::cache::HashMapCache;
 use crate::prelude::*;
-use crate::HashMapCache;
 use serde_json::Value;
+use std::fmt::Debug;
 
 pub struct Cachable<'a> {
     pub key: &'a str,
     pub value: Value,
 }
 
-pub trait CacheStore {
-    fn new(ttl: u32, delete_on_expire: bool) -> Self;
+pub trait CacheLike: Debug + Send + Sync + 'static {
     fn set(&mut self, key: &str, value: &Value);
     fn set_multiple(&mut self, vec: Vec<Cachable>);
-    fn get(&mut self, key: impl Into<String>) -> Option<Value>;
-    fn get_multiple(&mut self, keys: Vec<impl Into<String>>) -> Vec<Value>;
-    fn delete(&mut self, key: impl Into<String>);
-    fn delete_multiple(&mut self, keys: Vec<impl Into<String>>);
-    fn keys(&mut self) -> Vec<String>;
-    fn has(&mut self, key: impl Into<String>) -> bool;
+    fn get(&self, key: &str) -> Option<Value>;
+    fn get_multiple(&self, keys: Vec<&str>) -> Vec<Value>;
+    fn delete(&mut self, key: &str);
+    fn delete_multiple(&mut self, keys: Vec<&str>);
+    fn keys(&self) -> Vec<String>;
+    fn has(&self, key: &str) -> bool;
 }
 
-pub enum Cache {
-    Empty,
+pub enum CacheKind {
+    Default,
     HashMap,
 }
 
+pub struct Cache;
+
 impl Cache {
-    // TODO: Accept parameters here
-    pub fn create(cache_type: Cache) -> impl CacheStore {
-        match cache_type {
-            Cache::HashMap => HashMapCache::new(0, false),
-            Cache::Empty => HashMapCache::default(),
+    pub fn create(kind: CacheKind) -> HashMapCache {
+        match kind {
+            CacheKind::Default => HashMapCache::default(),
+            CacheKind::HashMap => HashMapCache::default(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cache() {
+        let mut cache = Cache::create(CacheKind::Default);
+
+        cache.set("test", &Value::String("test".to_string()));
+        assert_eq!(cache.get("test"), Some(Value::String("test".to_string())));
     }
 }
