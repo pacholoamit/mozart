@@ -20,6 +20,7 @@ pub struct CacheService {
     shared: Arc<Mutex<Box<dyn CacheLike>>>,
 }
 
+//TODO: Create module for shared cache to wrap "CacheLike" in Arc<Mutex<Box<dyn CacheLike>>>
 #[derive(Debug)]
 pub struct SharedCache {
     cache: Arc<Mutex<Box<dyn CacheLike>>>,
