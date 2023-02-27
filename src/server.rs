@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use crate::cache::{Cache, CacheKind, CacheLike, HashMapCache};
 use crate::prelude::*;
-use protobuf::cache_server::{Cache as CacheProtoLike, CacheServer};
+use protobuf::cache_server::{Cache as CacheProto, CacheServer};
 use protobuf::{CacheGetRequest, CacheGetResponse, CacheSetRequest, CacheSetResponse};
 use serde_json::Value;
 use tokio::sync::Mutex;
@@ -17,17 +17,31 @@ type GrpcResult<T> = Result<Response<T>, Status>;
 
 #[derive(Debug)]
 pub struct CacheService {
-    cache: HashMapCache,
+    shared: Arc<Mutex<Box<dyn CacheLike>>>,
+}
+
+#[derive(Debug)]
+pub struct SharedCache {
+    cache: Arc<Mutex<Box<dyn CacheLike>>>,
+}
+
+impl Default for SharedCache {
+    fn default() -> Self {
+        Self {
+            cache: Arc::new(Mutex::new(Box::new(Cache::create(CacheKind::Default)))),
+        }
+    }
 }
 
 #[tonic::async_trait]
-impl CacheProtoLike for CacheService {
+impl CacheProto for CacheService {
     async fn get(&self, request: Request<CacheGetRequest>) -> GrpcResult<CacheGetResponse> {
         let req = request.into_inner();
+        let cache = self.shared.lock().await;
 
-        let mut cache = self.cache.clone();
+        cache.get(&req.key);
 
-        let value: String = match cache.get(&req.key) {
+        let value: String = match &cache.get(&req.key) {
             Some(value) => Value::String(value.to_string()).to_string(),
             None => String::from(""),
         };
@@ -39,8 +53,7 @@ impl CacheProtoLike for CacheService {
 
     async fn set(&self, request: Request<CacheSetRequest>) -> GrpcResult<CacheSetResponse> {
         let req = request.into_inner();
-
-        let mut cache = self.cache.clone();
+        let mut cache = self.shared.lock().await;
 
         cache.set(&req.key, &Value::String(req.value));
 
@@ -52,7 +65,7 @@ impl CacheProtoLike for CacheService {
 
 pub async fn run(addr: SocketAddr) -> Result<()> {
     let cache_service = CacheService {
-        cache: HashMapCache::default(),
+        shared: Arc::new(Mutex::new(Box::new(Cache::create(CacheKind::Default)))),
     };
 
     println!("Server listening on {}", addr);

@@ -1,22 +1,22 @@
 use crate::cache::HashMapCache;
 use crate::prelude::*;
 use serde_json::Value;
+use std::fmt::Debug;
 
 pub struct Cachable<'a> {
     pub key: &'a str,
     pub value: Value,
 }
 
-pub trait CacheLike {
-    fn new(ttl: u32, delete_on_expire: bool) -> Self;
+pub trait CacheLike: Debug + Send + Sync + 'static {
     fn set(&mut self, key: &str, value: &Value);
     fn set_multiple(&mut self, vec: Vec<Cachable>);
-    fn get(&mut self, key: &str) -> Option<Value>;
-    fn get_multiple(&mut self, keys: Vec<&str>) -> Vec<Value>;
+    fn get(&self, key: &str) -> Option<Value>;
+    fn get_multiple(&self, keys: Vec<&str>) -> Vec<Value>;
     fn delete(&mut self, key: &str);
     fn delete_multiple(&mut self, keys: Vec<&str>);
-    fn keys(&mut self) -> Vec<String>;
-    fn has(&mut self, key: &str) -> bool;
+    fn keys(&self) -> Vec<String>;
+    fn has(&self, key: &str) -> bool;
 }
 
 pub enum CacheKind {

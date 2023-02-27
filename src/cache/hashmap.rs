@@ -13,7 +13,7 @@ pub struct HashMapCache {
     store: HashMap<String, Value>,
 }
 
-impl CacheLike for HashMapCache {
+impl HashMapCache {
     fn new(ttl: u32, delete_on_expire: bool) -> Self {
         HashMapCache {
             ttl,
@@ -21,7 +21,9 @@ impl CacheLike for HashMapCache {
             store: HashMap::new(),
         }
     }
+}
 
+impl CacheLike for HashMapCache {
     fn set(&mut self, key: &str, value: &Value) {
         self.store.insert(key.to_string(), value.clone());
     }
@@ -30,11 +32,11 @@ impl CacheLike for HashMapCache {
         objects.iter().for_each(|obj| self.set(obj.key, &obj.value))
     }
 
-    fn get(&mut self, key: &str) -> Option<Value> {
+    fn get(&self, key: &str) -> Option<Value> {
         self.store.get(key).to_owned().cloned()
     }
 
-    fn get_multiple(&mut self, keys: Vec<&str>) -> Vec<Value> {
+    fn get_multiple(&self, keys: Vec<&str>) -> Vec<Value> {
         keys.into_iter().filter_map(|key| self.get(key)).collect()
     }
 
@@ -46,11 +48,11 @@ impl CacheLike for HashMapCache {
         keys.into_iter().for_each(|key| self.delete(key))
     }
 
-    fn keys(&mut self) -> Vec<String> {
+    fn keys(&self) -> Vec<String> {
         self.store.keys().cloned().collect()
     }
 
-    fn has(&mut self, key: &str) -> bool {
+    fn has(&self, key: &str) -> bool {
         self.store.contains_key(key)
     }
 }
