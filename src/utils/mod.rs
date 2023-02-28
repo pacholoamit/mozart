@@ -1,1 +1,2 @@
-fn todo() {}
+mod shared;
+pub use shared::ToShared;
