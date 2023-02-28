@@ -1,6 +1,6 @@
 use crate::cache::{Cache, CacheKind, CacheLike};
 use crate::prelude::*;
-use crate::utils::Shared;
+use crate::utils::{serde_to_prost, Shared};
 use protobuf::cache_server::{Cache as CacheProto, CacheServer};
 use protobuf::{CacheGetRequest, CacheGetResponse, CacheSetRequest, CacheSetResponse};
 use serde_json::Value;
@@ -34,16 +34,15 @@ impl CacheProto for CacheService {
 
         cache.get(&req.key);
 
-        let value: String = match &cache.get(&req.key) {
-            Some(value) => Value::String(value.to_string()).to_string(),
-            None => String::from(""),
+        let value = &cache.get(&req.key);
+
+        let value: prost_types::Value = match value {
+            Some(value) => serde_to_prost(value),
+            None => prost_types::Value { kind: None },
         };
 
-        // TODO: Make this serializable or something
-        let default = prost_types::Value::default();
-        let response = CacheGetResponse {
-            value: Some(default),
-        };
+        // TODO: Make this better
+        let response = CacheGetResponse { value: Some(value) };
 
         Ok(Response::new(response))
     }
