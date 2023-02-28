@@ -11,7 +11,7 @@ pub enum Error {
 
 #[derive(Error, Debug, PartialEq)]
 pub enum CacheError {
-    #[error("Key `{0}` does not exist in cache")]
+    #[error("Key `{0}` not found")]
     CacheKeyNotFound(String),
 }
 

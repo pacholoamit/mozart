@@ -1,6 +1,6 @@
 use crate::cache::{Cache, CacheKind, CacheLike};
 use crate::prelude::*;
-use crate::utils::ToShared;
+use crate::utils::Shared;
 use protobuf::cache_server::{Cache as CacheProto, CacheServer};
 use protobuf::{CacheGetRequest, CacheGetResponse, CacheSetRequest, CacheSetResponse};
 use serde_json::Value;
@@ -15,13 +15,13 @@ type GrpcResult<T> = Result<Response<T>, Status>;
 
 #[derive(Debug)]
 pub struct CacheService {
-    instance: ToShared<Box<dyn CacheLike>>,
+    instance: Shared<Box<dyn CacheLike>>,
 }
 
 impl Default for CacheService {
     fn default() -> Self {
         Self {
-            instance: ToShared::new(Box::new(Cache::create(CacheKind::Default))),
+            instance: Shared::new(Box::new(Cache::create(CacheKind::Default))),
         }
     }
 }
@@ -39,7 +39,11 @@ impl CacheProto for CacheService {
             None => String::from(""),
         };
 
-        let response = CacheGetResponse { value };
+        // TODO: Make this serializable or something
+        let default = prost_types::Value::default();
+        let response = CacheGetResponse {
+            value: Some(default),
+        };
 
         Ok(Response::new(response))
     }

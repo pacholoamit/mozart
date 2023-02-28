@@ -2,6 +2,7 @@
 syntax = "proto3";
 package cache;
 
+import "google/protobuf/struct.proto";
 
 service Cache {
     rpc Get (CacheGetRequest) returns (CacheGetResponse);
@@ -13,7 +14,7 @@ message CacheGetRequest {
 }
 
 message CacheGetResponse {
-    string value = 1;
+    google.protobuf.Value value = 2;
 }
 
 message CacheSetRequest {
